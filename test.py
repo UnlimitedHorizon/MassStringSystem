@@ -4,33 +4,16 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QTimer
 import numpy as np
 
-outfile = open("outfile.txt", "w")
+outfile = open("outfile.output", "w")
 
 maxLevel = 2
 class Element:
     def __init__(self):
         self.mass = 1
-        self.damping = 0.5
+        self.damping = -0.1
 
         self.position = np.zeros(3)
-        # self.lastPostion = np.zeros(3)
-
         self.velocity = np.zeros(3)
-
-        # self.preKList = [0 for x in range(maxLevel)]
-        # self.nextKList = [0 for x in range(maxLevel)]
-        # self.preRestLengthList = [0 for x in range(maxLevel)]
-        # self.nextRestLengthList = [0 for x in range(maxLevel)]
-        # self.kList = [1 for x in range(2*maxLevel + 1)]
-        # self.restLengthList = [0 for x in range(2*maxLevel + 1)]
-
-
-# class Spring:
-#     def __init__(self, k = 0):
-#         self.direction = np.zeros(3)
-#         self.length = 0
-#         self.restLength = 0
-#         self.k = k
         
 
 windowWidth = 640
@@ -46,7 +29,6 @@ class System:
         self.generate()
 
     def generate(self):
-        # self.n = n
         for i in range(self.n):
             e = Element()
             e.position = np.array([windowWidth/2, i*30, 0], dtype = float)
@@ -145,27 +127,6 @@ class Example(QWidget):
             x = random.randint(1, size.width()-1)
             y = random.randint(1, size.height()-1)
             qp.drawPoint(x, y)
-
-
-# class A:
-#     def __init__(self, b):
-#         self.b = b
-#         self.b.add()
-#         return
-#     def add(self):
-#         self.b.add()
-# class B:
-#     def __init__(self, *args, **kwargs):
-#         self.value = 0
-#         return super().__init__(*args, **kwargs)
-#     def add(self):
-#         self.value += 1
-# b = B()
-# a1 = A(b)
-# a2 = A(b)
-# print(b.value)
-# print(a1.b.value)
-# print(a2.b.value)
 
 
 if __name__ == "__main__":
