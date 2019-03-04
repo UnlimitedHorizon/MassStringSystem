@@ -22,9 +22,11 @@ class System:
     def __init__(self, n):
         self.elements = []
         self.n = n
+        self.axis = np.array([0, 1, 0])
+        self.axisK = -0.5
         self.kList = np.array([[1, 2, 0, 2, 1] for x in range (self.n)])
         self.restLengthList = np.zeros((self.n, 2*maxLevel+1))
-        self.accumilateTime = 0.0
+        self.accumulateTime = 0.0
 
         self.generate()
 
@@ -44,11 +46,12 @@ class System:
 
 
     def animate(self, deltaT):
-        self.accumilateTime += deltaT
+        self.accumulateTime += deltaT
         externalAcc = np.array([1, 9.8, 0])
         tempVelocitys = np.zeros((self.n, 3))
         tempPositions = np.zeros((self.n, 3))
         outfile.write("dT={:.3f}: ".format(deltaT))
+        position0 = self.elements[0].position
         for i in range(1, self.n):
             e = self.elements[i]
             resultantForce = np.zeros(3)
@@ -63,9 +66,16 @@ class System:
                     length = np.linalg.norm(vec)
                     f = k * (1 - restLength/length) * vec
                     resultantForce += f
+            # 质点间的弹簧弹力给予的加速度
             resultantAcc = resultantForce/e.mass
+            # 外力加速度（重力加速度/……）
             resultantAcc += externalAcc
+            # 速度阻尼加速度
             resultantAcc += e.velocity*e.damping
+            # 向心力
+            vec = e.position - position0
+            resultantAcc += self.axisK * (vec - self.axis * np.dot(self.axis, vec) / np.linalg.norm(self.axis))
+
             tempPositions[i] = e.position + (e.velocity + resultantAcc * deltaT / 2) * deltaT
             tempVelocitys[i] = e.velocity + resultantAcc * deltaT
             outfile.write("point{}:a={:7.3f}, p={:7.3f}, v={:7.3f}; ".format(i, resultantAcc[1], tempPositions[i][1], tempVelocitys[i][1]))
