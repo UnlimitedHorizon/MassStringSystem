@@ -23,7 +23,8 @@ class System:
         self.elements = []
         self.n = n
         self.axis = np.array([0, 1, 0])
-        self.axisK = -0.5
+        # self.axisK = -0.1
+        self.axisK = 0.0
         self.kList = np.array([[1, 2, 0, 2, 1] for x in range (self.n)])
         self.restLengthList = np.zeros((self.n, 2*maxLevel+1))
         self.accumulateTime = 0.0
@@ -33,8 +34,9 @@ class System:
     def generate(self):
         for i in range(self.n):
             e = Element()
-            e.position = np.array([windowWidth/2, i*30, 0], dtype = float)
+            e.position = np.array([windowWidth/2, i*100, 0], dtype = float)
             self.elements.append(e)
+
 
         # initialize rest length of springs
         for level in range(1, maxLevel + 1):
@@ -47,8 +49,8 @@ class System:
 
     def animate(self, deltaT):
         self.accumulateTime += deltaT
-        externalAcc = np.array([1, 9.8, 0])
-        tempVelocitys = np.zeros((self.n, 3))
+        externalAcc = np.array([5, 9.8, 0])
+        tempVelocities = np.zeros((self.n, 3))
         tempPositions = np.zeros((self.n, 3))
         outfile.write("dT={:.3f}: ".format(deltaT))
         position0 = self.elements[0].position
@@ -77,13 +79,13 @@ class System:
             resultantAcc += self.axisK * (vec - self.axis * np.dot(self.axis, vec) / np.linalg.norm(self.axis))
 
             tempPositions[i] = e.position + (e.velocity + resultantAcc * deltaT / 2) * deltaT
-            tempVelocitys[i] = e.velocity + resultantAcc * deltaT
-            outfile.write("point{}:a={:7.3f}, p={:7.3f}, v={:7.3f}; ".format(i, resultantAcc[1], tempPositions[i][1], tempVelocitys[i][1]))
+            tempVelocities[i] = e.velocity + resultantAcc * deltaT
+            outfile.write("point{}:a={:7.3f}, p={:7.3f}, v={:7.3f}; ".format(i, resultantAcc[1], tempPositions[i][1], tempVelocities[i][1]))
         outfile.write("\n")
 
         for i in range(1, self.n):
             self.elements[i].position = tempPositions[i]
-            self.elements[i].velocity = tempVelocitys[i]
+            self.elements[i].velocity = tempVelocities[i]
 
             
 
@@ -91,13 +93,13 @@ class System:
 class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.s = System(3)
+        self.s = System(5)
         self.lastTime = time.time()
         self.initUI()
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.process)
-        self.timer.start(30)
+        self.timer.start(1/15)
 
     def initUI(self):
         self.setGeometry(300, 300, windowWidth, windowHeight)
@@ -121,7 +123,7 @@ class Example(QWidget):
         eLast = None
         for e in elements:
             qp.setPen(QPen(Qt.blue, 4, Qt.SolidLine));
-            radius = 10
+            radius = 30
             qp.drawEllipse(e.position[0]-radius/2, windowHeight - e.position[1]-radius/2, radius, radius);
             if eLast is not None:
                 qp.drawLine(
@@ -143,3 +145,34 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())
+
+# def listAppend(l, e):
+#     l.append(e)
+# l = list()
+
+
+# def test(x, y):
+#     print('x:' + str(id(x)) + ', y:' + str(id(y)))
+#     x.append(1)
+#     print('x:' + str(id(x)))
+#     x+=y
+#     print('x:' + str(id(x)))
+#     print(x)
+# a=list()
+# print('a:' + str(id(a)))
+# a.append(1)
+# print('a:' + str(id(a)))
+# b=[2,3]
+# print('b:' + str(id(b)))
+# test(a,b)
+# print(a)
+
+# listAppend(l, 1)
+# print(l)
+# listAppend(l, "test")
+# print(l)
+# listAppend(l, True)
+# print(l)
+
+
+
